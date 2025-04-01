@@ -1,0 +1,37 @@
+# Bỏ qua file .env chứa thông tin nhạy cảm
+.env
+
+# Bỏ qua các file thực thi (thường được tạo khi build trên Windows, macOS, Linux)
+app/api/*.exe
+app/api/main
+*.exe
+
+# Bỏ qua thư mục và file tạm do Go tạo
+*.test
+*.prof
+/tmp/
+
+# Bỏ qua các file log
+logs/
+*.log
+
+# Bỏ qua các file tạm của IDE (VS Code, IntelliJ, v.v.)
+.vscode/
+.idea/
+
+# Bỏ qua các file tạm của hệ điều hành
+.DS_Store
+Thumbs.db
+
+# Bỏ qua các thư mục chứa file upload hoặc export (nếu có)
+upload/
+export/
+qrcode/
+
+# Bỏ qua các file build hoặc cache
+bin/
+dist/
+vendor/
+
+# Bỏ qua các file coverage (dùng khi test)
+coverage.out
