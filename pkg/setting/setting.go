@@ -1,6 +1,7 @@
 package setting
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -54,68 +55,43 @@ var DatabaseSetting = &Database{}
 
 // Setup initializes the configuration instance
 func Setup() {
-	// Tải file .env
 	err := godotenv.Load()
 	if err != nil {
-		panic("Error loading .env file: " + err.Error())
+		fmt.Printf("Warning: Error loading .env file: %v. Using default values.", err)
 	}
 
 	// App settings
-	AppSetting.JwtSecret = getEnv("JWT_SECRET", "default-secret")
-	AppSetting.PageSize = getEnvAsInt("PAGE_SIZE", 10)
-	AppSetting.PrefixUrl = getEnv("PREFIX_URL", "http://127.0.0.1:8000")
-	AppSetting.RuntimeRootPath = getEnv("RUNTIME_ROOT_PATH", "runtime/")
+	AppSetting.JwtSecret = os.Getenv("JWT_SECRET")
+	AppSetting.PageSize, _ = strconv.Atoi(os.Getenv("PAGE_SIZE"))
+	AppSetting.PrefixUrl = os.Getenv("PREFIX_URL")
+	AppSetting.RuntimeRootPath = os.Getenv("RUNTIME_ROOT_PATH")
 
-	AppSetting.ImageSavePath = getEnv("IMAGE_SAVE_PATH", "upload/images")
-	AppSetting.ImageMaxSize = getEnvAsInt("IMAGE_MAX_SIZE", 10*1024*1024)
-	AppSetting.ImageAllowExts = getEnvAsSlice("IMAGE_ALLOW_EXTS", []string{".jpg", ".jpeg", ".png"}, ",")
+	AppSetting.ImageSavePath = os.Getenv("IMAGE_SAVE_PATH")
+	AppSetting.ImageMaxSize, _ = strconv.Atoi(os.Getenv("IMAGE_MAX_SIZE"))
+	AppSetting.ImageAllowExts = strings.Split(os.Getenv("IMAGE_ALLOW_EXTS"), ",")
 
-	AppSetting.ExportSavePath = getEnv("EXPORT_SAVE_PATH", "export/")
-	AppSetting.QrCodeSavePath = getEnv("QRCODE_SAVE_PATH", "qrcode/")
-	AppSetting.FontSavePath = getEnv("FONT_SAVE_PATH", "fonts/")
+	AppSetting.ExportSavePath = os.Getenv("EXPORT_SAVE_PATH")
+	AppSetting.QrCodeSavePath = os.Getenv("QRCODE_SAVE_PATH")
+	AppSetting.FontSavePath = os.Getenv("FONT_SAVE_PATH")
 
-	AppSetting.LogSavePath = getEnv("LOG_SAVE_PATH", "logs/")
-	AppSetting.LogSaveName = getEnv("LOG_SAVE_NAME", "log")
-	AppSetting.LogFileExt = getEnv("LOG_FILE_EXT", "log")
-	AppSetting.TimeFormat = getEnv("TIME_FORMAT", "20060102")
+	AppSetting.LogSavePath = os.Getenv("LOG_SAVE_PATH")
+	AppSetting.LogSaveName = os.Getenv("LOG_SAVE_NAME")
+	AppSetting.LogFileExt = os.Getenv("LOG_FILE_EXT")
+	AppSetting.TimeFormat = os.Getenv("TIME_FORMAT")
 
 	// Server settings
-	ServerSetting.RunMode = getEnv("RUN_MODE", "debug")
-	ServerSetting.HttpPort = getEnvAsInt("HTTP_PORT", 8000)
-	ServerSetting.ReadTimeout = time.Duration(getEnvAsInt("READ_TIMEOUT", 60)) * time.Second
-	ServerSetting.WriteTimeout = time.Duration(getEnvAsInt("WRITE_TIMEOUT", 60)) * time.Second
+	ServerSetting.RunMode = os.Getenv("RUN_MODE")
+	ServerSetting.HttpPort, _ = strconv.Atoi(os.Getenv("HTTP_PORT"))
+	readTimeout, _ := strconv.Atoi(os.Getenv("READ_TIMEOUT"))
+	ServerSetting.ReadTimeout = time.Duration(readTimeout) * time.Second
+	writeTimeout, _ := strconv.Atoi(os.Getenv("WRITE_TIMEOUT"))
+	ServerSetting.WriteTimeout = time.Duration(writeTimeout) * time.Second
 
 	// Database settings
-	DatabaseSetting.Type = getEnv("DB_TYPE", "sqlserver")
-	DatabaseSetting.User = getEnv("DB_USER", "sa")
-	DatabaseSetting.Password = getEnv("DB_PASSWORD", "123456789")
-	DatabaseSetting.Host = getEnv("DB_HOST", "localhost:1433")
-	DatabaseSetting.Name = getEnv("DB_NAME", "AdventureWorks2017")
-	DatabaseSetting.TablePrefix = getEnv("DB_TABLE_PREFIX", "")
-}
-
-// getEnv lấy giá trị từ biến môi trường, nếu không có thì trả về giá trị mặc định
-func getEnv(key, defaultValue string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return defaultValue
-}
-
-// getEnvAsInt lấy giá trị từ biến môi trường và chuyển thành int
-func getEnvAsInt(key string, defaultValue int) int {
-	valueStr := getEnv(key, "")
-	if value, err := strconv.Atoi(valueStr); err == nil {
-		return value
-	}
-	return defaultValue
-}
-
-// getEnvAsSlice lấy giá trị từ biến môi trường và chuyển thành slice
-func getEnvAsSlice(key string, defaultValue []string, sep string) []string {
-	valueStr := getEnv(key, "")
-	if valueStr == "" {
-		return defaultValue
-	}
-	return strings.Split(valueStr, sep)
+	DatabaseSetting.Type = os.Getenv("DB_TYPE")
+	DatabaseSetting.User = os.Getenv("DB_USER")
+	DatabaseSetting.Password = os.Getenv("DB_PASSWORD")
+	DatabaseSetting.Host = os.Getenv("DB_HOST")
+	DatabaseSetting.Name = os.Getenv("DB_NAME")
+	DatabaseSetting.TablePrefix = os.Getenv("DB_TABLE_PREFIX")
 }

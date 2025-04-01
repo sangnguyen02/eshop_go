@@ -2,23 +2,46 @@ package routes
 
 import (
 	"go_ecommerce/internal/handlers"
-	"go_ecommerce/internal/repository"
-	"go_ecommerce/internal/services"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
-	// Khởi tạo repository
-	productRepo := repository.NewProductRepository(db)
+func RegisterRoutes(r *gin.Engine) {
 
-	// Khởi tạo service
-	productService := services.NewProductService(productRepo)
+	productHandler := handlers.NewProductHandler()
+	categoryHandler := handlers.NewCategoryHandler()
+	brandHandler := handlers.NewBrandHandler()
+	seedHandler := handlers.NewSeedHandler() // sample data
 
-	// Khởi tạo handler
-	productHandler := handlers.NewProductHandler(productService)
+	// #region API V1
+	apiV1 := r.Group("/api/v1")
 
-	// Định nghĩa route
-	r.GET("/products/search", productHandler.SearchProducts)
+	// Product
+	products := apiV1.Group("/products")
+	products.GET("/search", productHandler.SearchProducts)
+	products.GET("/:id", productHandler.GetProductByID)
+	products.POST("", productHandler.CreateProduct)
+	products.PUT("/:id", productHandler.UpdateProduct)
+	products.DELETE("/:id", productHandler.DeleteProduct)
+
+	// Category
+	categories := apiV1.Group("/categories")
+	categories.GET("/", categoryHandler.GetAllCategories)
+	categories.GET("/:id", categoryHandler.GetCategoryByID)
+	categories.POST("", categoryHandler.CreateCategory)
+	categories.PUT("/:id", categoryHandler.UpdateCategory)
+	categories.DELETE("/:id", categoryHandler.DeleteCategory)
+
+	// Brand
+	brands := apiV1.Group("/brands")
+	brands.GET("/", brandHandler.GetAllBrands)
+	brands.GET("/:id", brandHandler.GetBrandByID)
+	brands.POST("", brandHandler.CreateBrand)
+	brands.PUT("/:id", brandHandler.UpdateBrand)
+	brands.DELETE("/:id", brandHandler.DeleteBrand)
+
+	// Seed
+	apiV1.POST("/seed", seedHandler.SeedData)
+
+	// #region API V2
 }

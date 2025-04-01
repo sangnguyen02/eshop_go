@@ -10,17 +10,17 @@ import (
 )
 
 func main() {
-	// Khởi tạo cấu hình
+	// init setting
 	setting.Setup()
 
-	// Khởi tạo kết nối database
-	db := database.InitDB()
+	// init db conn
+	_ = database.InitDB()
 
 	// Khởi tạo Gin router
 	r := gin.Default()
 
 	// Đăng ký các route
-	routes.RegisterRoutes(r, db)
+	routes.RegisterRoutes(r)
 
 	// Chạy server
 	port := fmt.Sprintf(":%d", setting.ServerSetting.HttpPort)
@@ -28,4 +28,5 @@ func main() {
 	if err := r.Run(port); err != nil {
 		fmt.Println("Error starting server:", err)
 	}
+
 }
