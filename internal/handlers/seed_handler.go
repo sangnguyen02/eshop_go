@@ -1,9 +1,14 @@
 package handlers
 
 import (
+	"fmt"
 	"go_ecommerce/internal/models"
 	"go_ecommerce/internal/repository"
+	"math/rand"
 	"net/http"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,171 +27,199 @@ func NewSeedHandler() *SeedHandler {
 	}
 }
 
-func (h *SeedHandler) SeedData(c *gin.Context) {
-
-	// Tạo category Electronics trước
-	electronics := models.Category{
-		Name:        "Electronics",
-		Slug:        "electronics",
-		Description: "Category for electronic products",
+// Từ khóa cho ngành thời trang
+var (
+	categoryNames    = []string{"Men's Clothing", "Women's Clothing", "Kids' Clothing", "Footwear", "Accessories"}
+	subCategoryNames = map[string][]string{
+		"Men's Clothing":   {"Shirts", "Pants", "Jackets"},
+		"Women's Clothing": {"Dresses", "Skirts", "Tops"},
+		"Kids' Clothing":   {"T-Shirts", "Shorts", "Sweaters"},
+		"Footwear":         {"Sneakers", "Boots", "Sandals"},
+		"Accessories":      {"Hats", "Bags", "Scarves"},
 	}
-	if err := h.categoryRepo.Create(&electronics); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to seed electronics category: " + err.Error()})
+	brandNames   = []string{"Zara", "H&M", "Uniqlo", "Nike", "Adidas", "Gucci", "Prada", "Levi's", "Puma", "Chanel"}
+	productTypes = []string{"T-Shirt", "Jeans", "Jacket", "Sneakers", "Dress", "Shirt", "Skirt", "Hat", "Bag", "Scarf"}
+	colors       = []string{"Black", "White", "Blue", "Red", "Green", "Gray", "Yellow"}
+	sizes        = []string{"S", "M", "L", "XL", "XXL"}
+)
+
+func (h *SeedHandler) SeedData(c *gin.Context) {
+	const (
+		numCategories = 5
+		numBrands     = 10
+		numProducts   = 5000
+		batchSize     = 100
+	)
+
+	rand.Seed(time.Now().UnixNano())
+	tx := h.categoryRepo.GetDB().Begin()
+	if tx.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to start transaction: " + tx.Error.Error()})
+		return
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "panic occurred: " + fmt.Sprint(r)})
+		}
+	}()
+
+	// Tạo categories (cha và con)
+	var categories []models.Category
+	categoryMap := make(map[string]uint) // Lưu ID của danh mục cha
+
+	// Tạo danh mục cha
+	for i := 0; i < numCategories; i++ {
+		categoryName := categoryNames[i]
+		slug := strings.ToLower(strings.ReplaceAll(categoryName, " ", "-"))
+
+		categories = append(categories, models.Category{
+			Name:        categoryName,
+			Slug:        slug,
+			Description: "Category for " + categoryName,
+		})
+	}
+	if err := tx.CreateInBatches(categories, batchSize).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to seed categories: " + err.Error()})
 		return
 	}
 
-	// Tạo các category còn lại
-	categories := []models.Category{
-		{
-			Name:        "Phones",
-			Slug:        "phones",
-			Description: "Category for mobile phones",
-			ParentID:    &electronics.ID, // Gán ParentID là ID của Electronics
-		},
-		{
-			Name:        "Laptops",
-			Slug:        "laptops",
-			Description: "Category for laptops",
-			ParentID:    &electronics.ID, // Gán ParentID là ID của Electronics
-		},
-		{
-			Name:        "Clothing",
-			Slug:        "clothing",
-			Description: "Category for clothing products",
-		},
+	// Lưu ID của danh mục cha
+	for _, cat := range categories {
+		categoryMap[cat.Name] = cat.ID
 	}
 
-	// Thêm các category còn lại vào database
-	for i := range categories {
-		if err := h.categoryRepo.Create(&categories[i]); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to seed categories: " + err.Error()})
-			return
+	// Tạo danh mục con
+	var subCategories []models.Category
+	for parentName, subs := range subCategoryNames {
+		parentID := categoryMap[parentName]
+		for _, subName := range subs {
+			slug := strings.ToLower(strings.ReplaceAll(subName, " ", "-"))
+			subCategories = append(subCategories, models.Category{
+				Name:        subName,
+				Slug:        slug,
+				Description: "Subcategory for " + subName,
+				ParentID:    &parentID,
+			})
+		}
+	}
+	if err := tx.CreateInBatches(subCategories, batchSize).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to seed subcategories: " + err.Error()})
+		return
+	}
+
+	// Lấy danh sách category IDs thực tế
+	var categoryIDs []uint
+	if err := tx.Model(&models.Category{}).Select("id").Find(&categoryIDs).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch category IDs: " + err.Error()})
+		return
+	}
+
+	// Tạo brands
+	var brands []models.Brand
+	for i := 0; i < numBrands; i++ {
+		brandName := brandNames[i]
+		slug := strings.ToLower(brandName)
+
+		brands = append(brands, models.Brand{
+			Name:        brandName,
+			Slug:        slug,
+			Description: "Description for " + brandName,
+			LogoURL:     "https://example.com/" + slug + "-logo.png",
+		})
+	}
+	if err := tx.CreateInBatches(brands, batchSize).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to seed brands: " + err.Error()})
+		return
+	}
+
+	// Lấy danh sách brand IDs thực tế
+	var brandIDs []uint
+	if err := tx.Model(&models.Brand{}).Select("id").Find(&brandIDs).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch brand IDs: " + err.Error()})
+		return
+	}
+
+	// Tạo products
+	var products []models.Product
+	for i := 1; i <= numProducts; i++ {
+		// Chọn CategoryID và BrandID từ danh sách thực tế
+		categoryID := categoryIDs[rand.Intn(len(categoryIDs))]
+		brandID := brandIDs[rand.Intn(len(brandIDs))]
+		productType := productTypes[rand.Intn(len(productTypes))]
+		brandName := brandNames[(int(brandID)-1)%len(brandNames)]
+		productName := brandName + " " + productType
+		slug := strings.ToLower(strings.ReplaceAll(productName, " ", "-")) + "-" + strconv.Itoa(i)
+
+		// Tạo variants
+		numVariants := rand.Intn(3) + 1
+		variants := make([]models.ProductVariant, numVariants)
+		for j := 0; j < numVariants; j++ {
+			color := colors[rand.Intn(len(colors))]
+			size := sizes[rand.Intn(len(sizes))]
+			variants[j] = models.ProductVariant{
+				SKU:           "SKU" + strconv.Itoa(i) + "-" + strconv.Itoa(j),
+				Name:          color + " " + size,
+				Price:         20.00 + float64(rand.Intn(200)),
+				StockQuantity: 5 + rand.Intn(50),
+				Attributes:    fmt.Sprintf(`{"color": "%s", "size": "%s"}`, color, size),
+			}
+		}
+
+		// Tạo images
+		images := []models.ProductImage{
+			{URL: "https://example.com/" + slug + "-1.jpg", IsPrimary: true},
+			{URL: "https://example.com/" + slug + "-2.jpg", IsPrimary: false},
+		}
+
+		// Tạo reviews
+		numReviews := rand.Intn(5)
+		reviews := make([]models.ProductReview, numReviews)
+		for j := 0; j < numReviews; j++ {
+			reviews[j] = models.ProductReview{
+				UserID:  uint(rand.Intn(100) + 1),
+				Rating:  rand.Intn(5) + 1,
+				Comment: "Review " + strconv.Itoa(j+1) + " for " + productName,
+			}
+		}
+
+		products = append(products, models.Product{
+			SKU:              "SKU" + strconv.Itoa(i),
+			Name:             productName,
+			Slug:             slug,
+			Description:      "Description for " + productName,
+			ShortDescription: "Short desc for " + productName,
+			Price:            30.00 + float64(rand.Intn(300)),
+			DiscountPrice:    20.00 + float64(rand.Intn(250)),
+			StockQuantity:    10 + rand.Intn(100),
+			CategoryID:       categoryID,
+			BrandID:          brandID,
+			Status:           models.ProductStatusActive,
+			Images:           images,
+			Variants:         variants,
+			Reviews:          reviews,
+		})
+
+		if len(products) == batchSize || i == numProducts {
+			if err := tx.CreateInBatches(products, batchSize).Error; err != nil {
+				tx.Rollback()
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to seed products: " + err.Error()})
+				return
+			}
+			products = nil
 		}
 	}
 
-	// Thêm dữ liệu mẫu cho brands
-	brands := []models.Brand{
-		{
-			Name:        "Apple",
-			Slug:        "apple",
-			Description: "Apple Inc.",
-			LogoURL:     "https://example.com/apple-logo.png",
-		},
-		{
-			Name:        "Samsung",
-			Slug:        "samsung",
-			Description: "Samsung Electronics",
-			LogoURL:     "https://example.com/samsung-logo.png",
-		},
-		{
-			Name:        "Dell",
-			Slug:        "dell",
-			Description: "Dell Technologies",
-			LogoURL:     "https://example.com/dell-logo.png",
-		},
-		{
-			Name:        "Nike",
-			Slug:        "nike",
-			Description: "Nike, Inc.",
-			LogoURL:     "https://example.com/nike-logo.png",
-		},
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to commit transaction: " + err.Error()})
+		return
 	}
 
-	// Thêm brands vào database
-	for i := range brands {
-		if err := h.brandRepo.Create(&brands[i]); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to seed brands: " + err.Error()})
-			return
-		}
-	}
-
-	// Thêm dữ liệu mẫu cho products
-	products := []models.Product{
-		{
-			SKU:              "IPHONE14PRO",
-			Name:             "iPhone 14 Pro",
-			Slug:             "iphone-14-pro",
-			Description:      "The latest iPhone 14 Pro with A16 Bionic chip.",
-			ShortDescription: "iPhone 14 Pro, 128GB, Space Black",
-			Price:            999.99,
-			DiscountPrice:    899.99,
-			StockQuantity:    100,
-			CategoryID:       categories[0].ID, // Phones
-			BrandID:          brands[0].ID,     // Apple
-			Status:           models.ProductStatusActive,
-			Images: []models.ProductImage{
-				{
-					URL:       "https://example.com/iphone14pro.jpg",
-					IsPrimary: true,
-				},
-			},
-		},
-		{
-			SKU:              "GALAXYS23",
-			Name:             "Samsung Galaxy S23",
-			Slug:             "galaxy-s23",
-			Description:      "The latest Samsung Galaxy S23 with Snapdragon 8 Gen 2.",
-			ShortDescription: "Galaxy S23, 256GB, Phantom Black",
-			Price:            799.99,
-			DiscountPrice:    749.99,
-			StockQuantity:    150,
-			CategoryID:       categories[0].ID, // Phones
-			BrandID:          brands[1].ID,     // Samsung
-			Status:           models.ProductStatusActive,
-			Images: []models.ProductImage{
-				{
-					URL:       "https://example.com/galaxys23.jpg",
-					IsPrimary: true,
-				},
-			},
-		},
-		{
-			SKU:              "DELLXPS13",
-			Name:             "Dell XPS 13",
-			Slug:             "dell-xps-13",
-			Description:      "The latest Dell XPS 13 with 11th Gen Intel processor.",
-			ShortDescription: "Dell XPS 13, 512GB SSD, Platinum Silver",
-			Price:            1299.99,
-			DiscountPrice:    1199.99,
-			StockQuantity:    50,
-			CategoryID:       categories[1].ID, // Laptops
-			BrandID:          brands[2].ID,     // Dell
-			Status:           models.ProductStatusActive,
-			Images: []models.ProductImage{
-				{
-					URL:       "https://example.com/dellxps13.jpg",
-					IsPrimary: true,
-				},
-			},
-		},
-		{
-			SKU:              "NIKEAIRMAX",
-			Name:             "Nike Air Max",
-			Slug:             "nike-air-max",
-			Description:      "The latest Nike Air Max sneakers.",
-			ShortDescription: "Nike Air Max, Size 10, Black",
-			Price:            149.99,
-			DiscountPrice:    129.99,
-			StockQuantity:    200,
-			CategoryID:       categories[2].ID, // Clothing
-			BrandID:          brands[3].ID,     // Nike
-			Status:           models.ProductStatusActive,
-			Images: []models.ProductImage{
-				{
-					URL:       "https://example.com/nikeairmax.jpg",
-					IsPrimary: true,
-				},
-			},
-		},
-	}
-
-	// Thêm products vào database
-	for i := range products {
-		if err := h.productRepo.Create(&products[i]); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to seed products: " + err.Error()})
-			return
-		}
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Sample data seeded successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Fashion sample data seeded successfully"})
 }

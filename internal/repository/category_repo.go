@@ -15,6 +15,10 @@ func NewCategoryRepository() *CategoryRepository {
 	return &CategoryRepository{db: database.GetDB()}
 }
 
+func (r *CategoryRepository) GetDB() *gorm.DB {
+	return r.db
+}
+
 func (r *CategoryRepository) Create(category *models.Category) error {
 	return r.db.Create(category).Error
 }
