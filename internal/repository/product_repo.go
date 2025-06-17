@@ -24,7 +24,11 @@ func (r *ProductRepository) FindByName(name string, page, pageSize int) ([]model
 		Preload("Category").
 		Preload("Brand").
 		Preload("Images").
-		Where("Name LIKE ?", "%"+name+"%")
+		Where("products.deleted_at IS NULL")
+
+	if name != "undefined" && name != "" {
+		query = query.Where("products.name LIKE ?", "%"+name+"%")
+	}
 
 	// Đếm tổng số sản phẩm
 	if err := query.Count(&total).Error; err != nil {

@@ -7,14 +7,27 @@ import (
 )
 
 func RegisterRoutes(r *gin.Engine) {
-
+	userHandler := handlers.NewUserHandler()
 	productHandler := handlers.NewProductHandler()
 	categoryHandler := handlers.NewCategoryHandler()
 	brandHandler := handlers.NewBrandHandler()
-	seedHandler := handlers.NewSeedHandler() // sample data
+	// seedHandler := handlers.NewSeedHandler() // sample data
 
 	// #region API V1
 	apiV1 := r.Group("/api/v1")
+	apiV1.POST("/signup", userHandler.SignUp)
+	// dang nhap
+	apiV1.POST("/signin", userHandler.SignIn)
+
+	// User
+	users := apiV1.Group("/users")
+	// users.POST("/signup", userHandler.SignUp)
+	// users.POST("/signin", userHandler.SignIn)
+	users.GET("/search", userHandler.SearchUsers)
+	users.GET("/:id", userHandler.GetUserByID)
+	users.PUT("/:id", userHandler.UpdateUser)
+	users.PUT("/pass/:id", userHandler.UpdatePassword)
+	users.DELETE("/:id", userHandler.DeleteUser)
 
 	// Product
 	products := apiV1.Group("/products")
@@ -41,7 +54,7 @@ func RegisterRoutes(r *gin.Engine) {
 	brands.DELETE("/:id", brandHandler.DeleteBrand)
 
 	// Seed
-	apiV1.POST("/seed", seedHandler.SeedData)
+	// apiV1.POST("/seed", seedHandler.SeedData)
 
 	// #region API V2
 }

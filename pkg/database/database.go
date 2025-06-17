@@ -31,6 +31,8 @@ func InitDB() *gorm.DB {
 
 	// migration
 	err = db.AutoMigrate(
+		&models.User{},
+		&models.UserCredentials{},
 		&models.Product{},
 		&models.Category{},
 		&models.Brand{},

@@ -27,27 +27,26 @@ func NewSeedHandler() *SeedHandler {
 	}
 }
 
-// Từ khóa cho ngành thời trang
 var (
-	categoryNames    = []string{"Men's Clothing", "Women's Clothing", "Kids' Clothing", "Footwear", "Accessories"}
+	categoryNames    = []string{"Badminton Rackets", "Shuttlecocks", "Badminton Shoes", "Badminton Apparel", "Badminton Accessories"}
 	subCategoryNames = map[string][]string{
-		"Men's Clothing":   {"Shirts", "Pants", "Jackets"},
-		"Women's Clothing": {"Dresses", "Skirts", "Tops"},
-		"Kids' Clothing":   {"T-Shirts", "Shorts", "Sweaters"},
-		"Footwear":         {"Sneakers", "Boots", "Sandals"},
-		"Accessories":      {"Hats", "Bags", "Scarves"},
+		"Badminton Rackets":     {"Offensive Rackets", "Defensive Rackets", "All-Around Rackets"},
+		"Shuttlecocks":          {"Feather Shuttlecocks", "Nylon Shuttlecocks"},
+		"Badminton Shoes":       {"Men's Shoes", "Women's Shoes", "Unisex Shoes"},
+		"Badminton Apparel":     {"Shirts", "Shorts", "Skirts"},
+		"Badminton Accessories": {"Grips", "Bags", "Strings"},
 	}
-	brandNames   = []string{"Zara", "H&M", "Uniqlo", "Nike", "Adidas", "Gucci", "Prada", "Levi's", "Puma", "Chanel"}
-	productTypes = []string{"T-Shirt", "Jeans", "Jacket", "Sneakers", "Dress", "Shirt", "Skirt", "Hat", "Bag", "Scarf"}
-	colors       = []string{"Black", "White", "Blue", "Red", "Green", "Gray", "Yellow"}
-	sizes        = []string{"S", "M", "L", "XL", "XXL"}
+	brandNames   = []string{"Yonex", "Victor", "Li-Ning", "Carlton", "Ashaway", "FZ Forza", "Babolat", "Apacs", "Wilson", "Karakal"}
+	productTypes = []string{"Racket", "Shuttlecock", "Shoes", "Shirt", "Shorts", "Skirt", "Grip", "Bag", "String"}
+	colors       = []string{"Black", "White", "Blue", "Red", "Green", "Yellow", "Orange"}
+	sizes        = []string{"XS", "S", "M", "L", "XL"}
 )
 
 func (h *SeedHandler) SeedData(c *gin.Context) {
 	const (
 		numCategories = 5
 		numBrands     = 10
-		numProducts   = 5000
+		numProducts   = 1000
 		batchSize     = 100
 	)
 
@@ -165,7 +164,7 @@ func (h *SeedHandler) SeedData(c *gin.Context) {
 			variants[j] = models.ProductVariant{
 				SKU:           "SKU" + strconv.Itoa(i) + "-" + strconv.Itoa(j),
 				Name:          color + " " + size,
-				Price:         20.00 + float64(rand.Intn(200)),
+				Price:         10.00 + float64(rand.Intn(150)),
 				StockQuantity: 5 + rand.Intn(50),
 				Attributes:    fmt.Sprintf(`{"color": "%s", "size": "%s"}`, color, size),
 			}
@@ -194,8 +193,8 @@ func (h *SeedHandler) SeedData(c *gin.Context) {
 			Slug:             slug,
 			Description:      "Description for " + productName,
 			ShortDescription: "Short desc for " + productName,
-			Price:            30.00 + float64(rand.Intn(300)),
-			DiscountPrice:    20.00 + float64(rand.Intn(250)),
+			Price:            15.00 + float64(rand.Intn(200)),
+			DiscountPrice:    10.00 + float64(rand.Intn(150)),
 			StockQuantity:    10 + rand.Intn(100),
 			CategoryID:       categoryID,
 			BrandID:          brandID,
@@ -221,5 +220,5 @@ func (h *SeedHandler) SeedData(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Fashion sample data seeded successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Badminton sample data seeded successfully"})
 }

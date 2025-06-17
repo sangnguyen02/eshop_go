@@ -20,10 +20,10 @@ func NewProductHandler() *ProductHandler {
 // SearchProducts searches products by name with pagination
 func (h *ProductHandler) SearchProducts(c *gin.Context) {
 	name := c.Query("name")
-	if name == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "name query parameter is required"})
-		return
-	}
+	// if name == "" {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "name query parameter is required"})
+	// 	return
+	// }
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
