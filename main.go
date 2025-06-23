@@ -20,7 +20,7 @@ func main() {
 	// init db connection
 	_ = database.InitDB()
 
-	// Khởi tạo Gin router
+	// init Gin
 	r := gin.New()
 	r.SetTrustedProxies([]string{"127.0.0.1"})
 	// Global middleware
@@ -30,10 +30,10 @@ func main() {
 	r.Use(gzip.Gzip(gzip.DefaultCompression)) // Nén response
 	r.Use(requestid.New())                    // Gắn ID cho mỗi request
 
-	// Đăng ký các route
+	// init route
 	routes.RegisterRoutes(r)
 
-	// Chạy server
+	// run server
 	port := fmt.Sprintf(":%d", setting.ServerSetting.HttpPort)
 	fmt.Printf("Starting server on port %s\n", port)
 	if err := r.Run(port); err != nil {
