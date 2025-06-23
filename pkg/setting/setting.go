@@ -43,6 +43,7 @@ type Server struct {
 var ServerSetting = &Server{}
 
 type Database struct {
+	Port        string
 	Type        string
 	User        string
 	Password    string
@@ -53,14 +54,12 @@ type Database struct {
 
 var DatabaseSetting = &Database{}
 
-// Setup initializes the configuration instance
 func Setup() {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Printf("Warning: Error loading .env file: %v. Using default values.", err)
 	}
 
-	// App settings
 	AppSetting.JwtSecret = os.Getenv("JWT_SECRET")
 	AppSetting.PageSize, _ = strconv.Atoi(os.Getenv("PAGE_SIZE"))
 	AppSetting.PrefixUrl = os.Getenv("PREFIX_URL")
@@ -79,7 +78,7 @@ func Setup() {
 	AppSetting.LogFileExt = os.Getenv("LOG_FILE_EXT")
 	AppSetting.TimeFormat = os.Getenv("TIME_FORMAT")
 
-	// Server settings
+	// Server
 	ServerSetting.RunMode = os.Getenv("RUN_MODE")
 	ServerSetting.HttpPort, _ = strconv.Atoi(os.Getenv("HTTP_PORT"))
 	readTimeout, _ := strconv.Atoi(os.Getenv("READ_TIMEOUT"))
@@ -87,7 +86,8 @@ func Setup() {
 	writeTimeout, _ := strconv.Atoi(os.Getenv("WRITE_TIMEOUT"))
 	ServerSetting.WriteTimeout = time.Duration(writeTimeout) * time.Second
 
-	// Database settings
+	// Database
+	DatabaseSetting.Port = os.Getenv("DB_PORT")
 	DatabaseSetting.Type = os.Getenv("DB_TYPE")
 	DatabaseSetting.User = os.Getenv("DB_USER")
 	DatabaseSetting.Password = os.Getenv("DB_PASSWORD")
