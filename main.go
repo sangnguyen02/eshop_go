@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"go_ecommerce/internal/middleware"
 	"go_ecommerce/internal/routes"
 	"go_ecommerce/pkg/database"
 	"go_ecommerce/pkg/setting"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/gzip"
-	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "go_ecommerce/docs"
 )
 
 func main() {
@@ -23,15 +25,15 @@ func main() {
 	// init Gin
 	r := gin.New()
 	r.SetTrustedProxies([]string{"127.0.0.1"})
-	// Global middleware
-	r.Use(gin.Logger())                       // Log request
-	r.Use(gin.Recovery())                     // Recover panic
-	r.Use(cors.Default())                     // CORS
-	r.Use(gzip.Gzip(gzip.DefaultCompression)) // Nén response
-	r.Use(requestid.New())                    // Gắn ID cho mỗi request
+
+	// global middleware
+	r.Use(middleware.InitMiddlewares()...)
 
 	// init route
 	routes.RegisterRoutes(r)
+
+	// swagger route
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// run server
 	port := fmt.Sprintf(":%d", setting.ServerSetting.HttpPort)

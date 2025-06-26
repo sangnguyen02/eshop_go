@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"go_ecommerce/internal/models"
+	"go_ecommerce/internal/model"
 	"go_ecommerce/pkg/database"
 
 	"gorm.io/gorm"
@@ -16,11 +16,11 @@ func NewProductRepository() *ProductRepository {
 }
 
 // FindByName searches products by name with pagination
-func (r *ProductRepository) FindByName(name string, page, pageSize int) ([]models.Product, int64, error) {
-	var products []models.Product
+func (r *ProductRepository) FindByName(name string, page, pageSize int) ([]model.Product, int64, error) {
+	var products []model.Product
 	var total int64
 
-	query := r.db.Model(&models.Product{}).
+	query := r.db.Model(&model.Product{}).
 		Preload("Category").
 		Preload("Brand").
 		Preload("Images").
@@ -42,8 +42,8 @@ func (r *ProductRepository) FindByName(name string, page, pageSize int) ([]model
 }
 
 // FindByID finds a product by ID with all related data
-func (r *ProductRepository) FindByID(id uint) (*models.Product, error) {
-	var product models.Product
+func (r *ProductRepository) FindByID(id uint) (*model.Product, error) {
+	var product model.Product
 	err := r.db.Preload("Category").
 		Preload("Brand").
 		Preload("Images").
@@ -54,16 +54,16 @@ func (r *ProductRepository) FindByID(id uint) (*models.Product, error) {
 }
 
 // Create creates a new product
-func (r *ProductRepository) Create(product *models.Product) error {
+func (r *ProductRepository) Create(product *model.Product) error {
 	return r.db.Create(product).Error
 }
 
 // Update updates an existing product
-func (r *ProductRepository) Update(product *models.Product) error {
+func (r *ProductRepository) Update(product *model.Product) error {
 	return r.db.Save(product).Error
 }
 
 // Delete soft deletes a product
 func (r *ProductRepository) Delete(id uint) error {
-	return r.db.Delete(&models.Product{}, id).Error
+	return r.db.Delete(&model.Product{}, id).Error
 }

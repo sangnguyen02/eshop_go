@@ -1,24 +1,33 @@
 package routes
 
 import (
-	"go_ecommerce/internal/handlers"
-	"go_ecommerce/pkg/middleware"
+	"go_ecommerce/internal/handler"
+	"go_ecommerce/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(r *gin.Engine) {
-	userHandler := handlers.NewUserHandler()
-	productHandler := handlers.NewProductHandler()
-	categoryHandler := handlers.NewCategoryHandler()
-	brandHandler := handlers.NewBrandHandler()
-	// seedHandler := handlers.NewSeedHandler() // sample data
+	// #region init hanlder
+	uploadHandler := handler.NewUploadHandler()
+	userHandler := handler.NewUserHandler()
+	productHandler := handler.NewProductHandler()
+	categoryHandler := handler.NewCategoryHandler()
+	brandHandler := handler.NewBrandHandler()
+	// seedHandler := handler.NewSeedHandler() // sample data
 
 	// #region API V1
 	apiV1 := r.Group("/api/v1")
 	apiV1.POST("/signup", userHandler.SignUp)
 	// dang nhap
 	apiV1.POST("/signin", userHandler.SignIn)
+
+	// #region upload route
+	upload := apiV1.Group("/upload")
+	{
+		upload.POST("", uploadHandler.UploadFileSingle)
+		upload.POST("/multiple", uploadHandler.UploadFileMultiple)
+	}
 
 	// #region protect route
 

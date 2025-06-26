@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"go_ecommerce/internal/models"
+	"go_ecommerce/internal/model"
 	"go_ecommerce/pkg/database"
 
 	"gorm.io/gorm"
@@ -16,8 +16,8 @@ func NewUserRepository() *UserRepository {
 }
 
 // FindByUsername finds a user by username
-func (r *UserRepository) FindByUsername(username string) (*models.User, error) {
-	var user models.User
+func (r *UserRepository) FindByUsername(username string) (*model.User, error) {
+	var user model.User
 	err := r.db.Preload("UserCredentials").
 		Where("username = ? AND status = ?", username, true).
 		First(&user).Error
@@ -25,19 +25,19 @@ func (r *UserRepository) FindByUsername(username string) (*models.User, error) {
 }
 
 // FindByID finds a user by ID
-func (r *UserRepository) FindByID(id uint) (*models.User, error) {
-	var user models.User
+func (r *UserRepository) FindByID(id uint) (*model.User, error) {
+	var user model.User
 	err := r.db.Preload("UserCredentials").
 		First(&user, id).Error
 	return &user, err
 }
 
 // SearchUsers searches users by name or username with pagination
-func (r *UserRepository) SearchUsers(name string, page, pageSize int) ([]models.User, int64, error) {
-	var users []models.User
+func (r *UserRepository) SearchUsers(name string, page, pageSize int) ([]model.User, int64, error) {
+	var users []model.User
 	var total int64
 
-	query := r.db.Model(&models.User{}).
+	query := r.db.Model(&model.User{}).
 		Preload("UserCredentials").
 		Where("CONCAT(first_name, ' ', last_name) LIKE ? OR username LIKE ?", "%"+name+"%", "%"+name+"%").
 		Where("deleted_at IS NULL")
@@ -52,8 +52,8 @@ func (r *UserRepository) SearchUsers(name string, page, pageSize int) ([]models.
 }
 
 // CheckDuplicate checks for duplicate username, phone, or email
-func (r *UserRepository) CheckDuplicate(username, phone, email string) (*models.User, error) {
-	var user models.User
+func (r *UserRepository) CheckDuplicate(username, phone, email string) (*model.User, error) {
+	var user model.User
 	err := r.db.Where("username = ? OR phone = ? OR email = ?", username, phone, email).
 		First(&user).Error
 	if err == gorm.ErrRecordNotFound {
@@ -63,8 +63,8 @@ func (r *UserRepository) CheckDuplicate(username, phone, email string) (*models.
 }
 
 // CheckDuplicateForUpdate checks for duplicate phone or email excluding the given ID
-func (r *UserRepository) CheckDuplicateForUpdate(id uint, phone, email string) (*models.User, error) {
-	var user models.User
+func (r *UserRepository) CheckDuplicateForUpdate(id uint, phone, email string) (*model.User, error) {
+	var user model.User
 	err := r.db.Where("id != ? AND (phone = ? OR email = ?)", id, phone, email).
 		First(&user).Error
 	if err == gorm.ErrRecordNotFound {
@@ -74,23 +74,23 @@ func (r *UserRepository) CheckDuplicateForUpdate(id uint, phone, email string) (
 }
 
 // Create creates a new user
-func (r *UserRepository) Create(user *models.User) error {
+func (r *UserRepository) Create(user *model.User) error {
 	return r.db.Create(user).Error
 }
 
 // Update updates an existing user
-func (r *UserRepository) Update(user *models.User) error {
+func (r *UserRepository) Update(user *model.User) error {
 	return r.db.Save(user).Error
 }
 
 // UpdatePassword updates the user's password
 func (r *UserRepository) UpdatePassword(userID uint, password string) error {
-	return r.db.Model(&models.UserCredentials{}).
+	return r.db.Model(&model.UserCredentials{}).
 		Where("user_id = ?", userID).
 		Update("password", password).Error
 }
 
 // Delete soft deletes a user
 func (r *UserRepository) Delete(id uint) error {
-	return r.db.Delete(&models.User{}, id).Error
+	return r.db.Delete(&model.User{}, id).Error
 }

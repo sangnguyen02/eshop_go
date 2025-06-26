@@ -2,7 +2,7 @@ package database
 
 import (
 	"fmt"
-	"go_ecommerce/internal/models"
+	"go_ecommerce/internal/model"
 	"go_ecommerce/pkg/setting"
 	"log"
 	"strconv"
@@ -17,7 +17,7 @@ var db *gorm.DB
 // initializes the database instance and performs migration
 func InitDB() *gorm.DB {
 
-	// SQL Server DSN format
+	/* SQL Server DSN format
 	// dsn := fmt.Sprintf("sqlserver://%s:%s@%s?database=%s",
 	// 	setting.DatabaseSetting.User,
 	// 	setting.DatabaseSetting.Password,
@@ -32,8 +32,9 @@ func InitDB() *gorm.DB {
 	// if err != nil {
 	// 	panic("Failed to connect to database (db): " + err.Error())
 	// }
+	*/
 
-	// PostgreSQL DSN format
+	/* PostgreSQL DSN format */
 
 	portStr := setting.DatabaseSetting.Port
 	port, err1 := strconv.Atoi(portStr)
@@ -59,14 +60,14 @@ func InitDB() *gorm.DB {
 
 	// migration
 	err = db.AutoMigrate(
-		&models.User{},
-		&models.UserCredentials{},
-		&models.Product{},
-		&models.Category{},
-		&models.Brand{},
-		&models.ProductImage{},
-		&models.ProductVariant{},
-		&models.ProductReview{},
+		&model.User{},
+		&model.UserCredentials{},
+		&model.Product{},
+		&model.Category{},
+		&model.Brand{},
+		&model.ProductImage{},
+		&model.ProductVariant{},
+		&model.ProductReview{},
 	)
 	if err != nil {
 		panic("Failed to migrate database (db): " + err.Error())

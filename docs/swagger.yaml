@@ -1,0 +1,1078 @@
+definitions:
+  handler.LoginForm:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handler.PasswordUpdateForm:
+    properties:
+      password:
+        type: string
+    required:
+    - password
+    type: object
+  handler.SignUpForm:
+    properties:
+      email:
+        type: string
+      fullname:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      status:
+        type: boolean
+      username:
+        type: string
+    required:
+    - email
+    - fullname
+    - password
+    - phone
+    - role
+    - status
+    - username
+    type: object
+  handler.UpdateForm:
+    properties:
+      email:
+        type: string
+      fullname:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      status:
+        type: boolean
+    required:
+    - email
+    - fullname
+    - password
+    - phone
+    - role
+    - status
+    type: object
+  model.Brand:
+    properties:
+      created_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      description:
+        type: string
+      id:
+        example: 1
+        type: integer
+      logoUrl:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+      updated_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+    type: object
+  model.Category:
+    properties:
+      created_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      description:
+        type: string
+      id:
+        example: 1
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+      parent:
+        $ref: '#/definitions/model.Category'
+      parentId:
+        type: integer
+      slug:
+        type: string
+      status:
+        type: boolean
+      updated_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+    type: object
+  model.ErrorResponse:
+    properties:
+      message:
+        example: invalid request
+        type: string
+    type: object
+  model.Product:
+    properties:
+      brand:
+        $ref: '#/definitions/model.Brand'
+      brandId:
+        type: integer
+      category:
+        $ref: '#/definitions/model.Category'
+      categoryId:
+        type: integer
+      created_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      description:
+        type: string
+      discountPrice:
+        type: number
+      id:
+        example: 1
+        type: integer
+      images:
+        items:
+          $ref: '#/definitions/model.ProductImage'
+        type: array
+      name:
+        type: string
+      price:
+        type: number
+      reviews:
+        items:
+          $ref: '#/definitions/model.ProductReview'
+        type: array
+      shortDescription:
+        type: string
+      sku:
+        type: string
+      slug:
+        type: string
+      status:
+        $ref: '#/definitions/model.ProductStatus'
+      stockQuantity:
+        type: integer
+      updated_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      variants:
+        items:
+          $ref: '#/definitions/model.ProductVariant'
+        type: array
+    type: object
+  model.ProductImage:
+    properties:
+      created_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      isPrimary:
+        description: Index cho ảnh chính
+        type: boolean
+      productId:
+        description: Composite index với IsPrimary
+        type: integer
+      updated_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      url:
+        type: string
+    type: object
+  model.ProductReview:
+    properties:
+      comment:
+        type: string
+      created_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      productId:
+        description: Index cho truy vấn đánh giá theo sản phẩm
+        type: integer
+      rating:
+        description: Index cho lọc/tính trung bình rating
+        type: integer
+      updated_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      userId:
+        description: Index cho truy vấn đánh giá theo user
+        type: integer
+    type: object
+  model.ProductStatus:
+    enum:
+    - active
+    - inactive
+    - out_of_stock
+    type: string
+    x-enum-varnames:
+    - ProductStatusActive
+    - ProductStatusInactive
+    - ProductStatusOutOfStock
+  model.ProductVariant:
+    properties:
+      attributes:
+        type: string
+      created_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      productId:
+        type: integer
+      sku:
+        type: string
+      stockQuantity:
+        type: integer
+      updated_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+    type: object
+  model.SuccessResponse:
+    properties:
+      message:
+        example: valid request
+        type: string
+    type: object
+  model.User:
+    properties:
+      created_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      email:
+        type: string
+      fullname:
+        type: string
+      id:
+        example: 1
+        type: integer
+      phone:
+        type: string
+      role:
+        type: string
+      status:
+        type: boolean
+      updated_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      userCredentials:
+        $ref: '#/definitions/model.UserCredentials'
+      username:
+        type: string
+    type: object
+  model.UserCredentials:
+    properties:
+      created_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      password:
+        type: string
+      updated_at:
+        example: "2025-06-24T15:04:05Z"
+        type: string
+      userId:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/brands:
+    get:
+      consumes:
+      - application/json
+      description: Get all brands with pagination and search
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      - description: Search by name
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all brands
+      tags:
+      - brands
+    post:
+      consumes:
+      - application/json
+      description: Create a new brand
+      parameters:
+      - description: Brand data
+        in: body
+        name: brand
+        required: true
+        schema:
+          $ref: '#/definitions/model.Brand'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Brand'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new brand
+      tags:
+      - brands
+  /api/v1/brands/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a brand by ID
+      parameters:
+      - description: Brand ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a brand
+      tags:
+      - brands
+    get:
+      consumes:
+      - application/json
+      description: Get details of a brand by ID
+      parameters:
+      - description: Brand ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Brand'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get brand by ID
+      tags:
+      - brands
+    put:
+      consumes:
+      - application/json
+      description: Update a brand by ID
+      parameters:
+      - description: Brand ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Brand data
+        in: body
+        name: brand
+        required: true
+        schema:
+          $ref: '#/definitions/model.Brand'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an existing brand
+      tags:
+      - brands
+  /api/v1/categories:
+    get:
+      consumes:
+      - application/json
+      description: Get all categories with pagination and search
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      - description: Search by name
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all categories
+      tags:
+      - categories
+    post:
+      consumes:
+      - application/json
+      description: Create a new category
+      parameters:
+      - description: Category data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/model.Category'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Category'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new category
+      tags:
+      - categories
+  /api/v1/categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a category
+      tags:
+      - categories
+    get:
+      consumes:
+      - application/json
+      description: Get details of a category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Category'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get category by ID
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: Update a category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Category data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/model.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an existing category
+      tags:
+      - categories
+  /api/v1/products:
+    post:
+      consumes:
+      - application/json
+      description: Create a new product
+      parameters:
+      - description: Product data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/model.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new product
+      tags:
+      - products
+  /api/v1/products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a product
+      tags:
+      - products
+    get:
+      consumes:
+      - application/json
+      description: Get details of a product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get product by ID
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Update an existing product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Product data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/model.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an existing product
+      tags:
+      - products
+  /api/v1/products/search:
+    get:
+      consumes:
+      - application/json
+      description: Search products with pagination
+      parameters:
+      - description: Product name
+        in: query
+        name: name
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Search products by name
+      tags:
+      - products
+  /api/v1/signin:
+    post:
+      consumes:
+      - application/json
+      description: Login a user and return a JWT token
+      parameters:
+      - description: User credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.LoginForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Sign in a user
+      tags:
+      - users
+  /api/v1/signup:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.SignUpForm'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Sign up a new user
+      tags:
+      - users
+  /api/v1/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a single image (jpg, jpeg, or png) to the server
+      parameters:
+      - description: Image file to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Upload a single image file
+      tags:
+      - upload
+  /api/v1/upload/multiple:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload multiple image files (jpg, jpeg, or png) to the server
+      parameters:
+      - description: Image files to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Upload multiple image files
+      tags:
+      - upload
+  /api/v1/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Get details of a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an existing user
+      tags:
+      - users
+  /api/v1/users/pass/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update the password of a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New password
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/handler.PasswordUpdateForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update user password
+      tags:
+      - users
+  /api/v1/users/search:
+    get:
+      consumes:
+      - application/json
+      description: Search users with pagination
+      parameters:
+      - description: User name
+        in: query
+        name: name
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Search users by name
+      tags:
+      - users
+swagger: "2.0"

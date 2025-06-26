@@ -29,6 +29,9 @@ type App struct {
 	LogSaveName string
 	LogFileExt  string
 	TimeFormat  string
+
+	FileMaxSize   int
+	FileAllowExts []string
 }
 
 var AppSetting = &App{}
@@ -63,11 +66,12 @@ func Setup() {
 	AppSetting.JwtSecret = os.Getenv("JWT_SECRET")
 	AppSetting.PageSize, _ = strconv.Atoi(os.Getenv("PAGE_SIZE"))
 	AppSetting.PrefixUrl = os.Getenv("PREFIX_URL")
-	AppSetting.RuntimeRootPath = os.Getenv("RUNTIME_ROOT_PATH")
+	// AppSetting.RuntimeRootPath = os.Getenv("RUNTIME_ROOT_PATH")
 
 	AppSetting.ImageSavePath = os.Getenv("IMAGE_SAVE_PATH")
 	AppSetting.ImageMaxSize, _ = strconv.Atoi(os.Getenv("IMAGE_MAX_SIZE"))
 	AppSetting.ImageAllowExts = strings.Split(os.Getenv("IMAGE_ALLOW_EXTS"), ",")
+	AppSetting.FileMaxSize, _ = strconv.Atoi(os.Getenv("FILE_MAX_SIZE"))
 
 	AppSetting.ExportSavePath = os.Getenv("EXPORT_SAVE_PATH")
 	AppSetting.QrCodeSavePath = os.Getenv("QRCODE_SAVE_PATH")
