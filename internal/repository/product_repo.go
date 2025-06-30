@@ -53,7 +53,7 @@ func (r *ProductRepository) FindByID(id uint) (*model.Product, error) {
 	return &product, err
 }
 
-// Create creates a new product
+// Create a new product
 func (r *ProductRepository) Create(product *model.Product) error {
 	return r.db.Create(product).Error
 }

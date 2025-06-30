@@ -56,11 +56,18 @@ func (h *CategoryHandler) GetAllCategories(c *gin.Context) {
 	search := c.Query("name")
 
 	statusStr := c.Query("status")
-	status, err := strconv.ParseBool(statusStr)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Parse Error",
-		})
+	var status bool
+	if statusStr == "" {
+		status = true
+	} else {
+		var err error
+		status, err = strconv.ParseBool(statusStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid status value, must be true or false",
+			})
+			return
+		}
 	}
 
 	page, err := strconv.Atoi(pageStr)

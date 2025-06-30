@@ -21,7 +21,7 @@ type Product struct {
 	DiscountPrice    float64          `gorm:"column:discount_price;index" json:"discountPrice"`
 	StockQuantity    int              `gorm:"column:stock_quantity;index" json:"stockQuantity"`
 	CategoryID       uint             `gorm:"column:category_id;index" json:"categoryId"`
-	Category         Category         `json:"category"`
+	Category         Category         `gorm:"foreignKey:CategoryID" json:"category"`
 	BrandID          uint             `gorm:"column:brand_id;index" json:"brandId"`
 	Brand            Brand            `json:"brand"`
 	Status           ProductStatus    `gorm:"column:status;index" json:"status"`

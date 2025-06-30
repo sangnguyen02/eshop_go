@@ -25,9 +25,11 @@ func RegisterRoutes(r *gin.Engine) {
 	// #region upload route
 	upload := apiV1.Group("/upload")
 	{
-		upload.POST("", uploadHandler.UploadFileSingle)
+		upload.POST("/", uploadHandler.UploadFileSingle)
 		upload.POST("/multiple", uploadHandler.UploadFileMultiple)
 	}
+
+	r.Static("/api/v1/upload/files/images", "./upload/files/images")
 
 	// #region protect route
 
@@ -51,7 +53,7 @@ func RegisterRoutes(r *gin.Engine) {
 		{
 			products.GET("/search", productHandler.SearchProducts)
 			products.GET("/:id", productHandler.GetProductByID)
-			products.POST("", productHandler.CreateProduct)
+			products.POST("/", productHandler.CreateProduct)
 			products.PUT("/:id", productHandler.UpdateProduct)
 			products.DELETE("/:id", productHandler.DeleteProduct)
 		}
@@ -61,7 +63,7 @@ func RegisterRoutes(r *gin.Engine) {
 		{
 			categories.GET("/", categoryHandler.GetAllCategories)
 			categories.GET("/:id", categoryHandler.GetCategoryByID)
-			categories.POST("", categoryHandler.CreateCategory)
+			categories.POST("/", categoryHandler.CreateCategory)
 			categories.PUT("/:id", categoryHandler.UpdateCategory)
 			categories.DELETE("/:id", categoryHandler.DeleteCategory)
 		}
@@ -71,7 +73,7 @@ func RegisterRoutes(r *gin.Engine) {
 		{
 			brands.GET("/", brandHandler.GetAllBrands)
 			brands.GET("/:id", brandHandler.GetBrandByID)
-			brands.POST("", brandHandler.CreateBrand)
+			brands.POST("/", brandHandler.CreateBrand)
 			brands.PUT("/:id", brandHandler.UpdateBrand)
 			brands.DELETE("/:id", brandHandler.DeleteBrand)
 		}
