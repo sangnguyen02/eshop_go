@@ -152,7 +152,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Brand"
+                            "$ref": "#/definitions/model.SuccessResponse"
                         }
                     },
                     "400": {
@@ -1367,6 +1367,9 @@ const docTemplate = `{
                 "slug": {
                     "type": "string"
                 },
+                "status": {
+                    "type": "boolean"
+                },
                 "updated_at": {
                     "type": "string",
                     "example": "2025-06-24T15:04:05Z"
@@ -1376,6 +1379,12 @@ const docTemplate = `{
         "model.Category": {
             "type": "object",
             "properties": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Category"
+                    }
+                },
                 "created_at": {
                     "type": "string",
                     "example": "2025-06-24T15:04:05Z"

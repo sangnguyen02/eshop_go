@@ -25,11 +25,16 @@ func (r *BrandRepository) FindByID(id uint) (*model.Brand, error) {
 	return &brand, err
 }
 
-func (r *BrandRepository) FindAll(page, pageSize int, search string) ([]model.Brand, int64, error) {
+func (r *BrandRepository) FindAll(page, pageSize int, search string, status bool) ([]model.Brand, int64, error) {
 	var brands []model.Brand
 	var total int64
 
-	query := r.db.Model(&model.Brand{})
+	query := r.db.Model(&model.Brand{}).Where("deleted_at IS NULL")
+
+	if !status {
+		query = query.Where("status = ?", true)
+	}
+
 	if search != "" {
 		query = query.Where("name LIKE ?", "%"+search+"%")
 	}
@@ -40,6 +45,7 @@ func (r *BrandRepository) FindAll(page, pageSize int, search string) ([]model.Br
 	}
 
 	offset := (page - 1) * pageSize
+
 	err = query.Offset(offset).Limit(pageSize).Find(&brands).Error
 	return brands, total, err
 }

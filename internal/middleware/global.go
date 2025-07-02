@@ -9,16 +9,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// InitMiddlewares initializes and returns a slice of Gin middleware
 func InitMiddlewares() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		gin.Logger(),                       // Log requests
-		gin.Recovery(),                     // Recover from panics
-		cors.Default(),                     // CORS with default config
+		gin.Logger(),   // Log requests
+		gin.Recovery(), // Recover from panics
+		corsMiddleware(),
 		gzip.Gzip(gzip.DefaultCompression), // Compress responses
 		requestid.New(),                    // Generate request ID
-		cacheControlForStatic(),            // Thêm middleware cho Cache-Control
+		// cacheControlForStatic(),
 	}
+}
+
+func corsMiddleware() gin.HandlerFunc {
+	return cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * 3600,
+	})
 }
 
 func cacheControlForStatic() gin.HandlerFunc {

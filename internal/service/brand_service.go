@@ -23,7 +23,7 @@ func (s *BrandService) CreateBrand(brand *model.Brand) error {
 	}
 
 	// Kiểm tra xem slug đã tồn tại chưa
-	existingBrand, _, err := s.repo.FindAll(1, 1, brand.Slug)
+	existingBrand, _, err := s.repo.FindAll(1, 1, brand.Slug, true)
 	if err != nil {
 		return fmt.Errorf("error checking existing category: %v", err)
 	}
@@ -38,8 +38,8 @@ func (s *BrandService) GetBrandByID(id uint) (*model.Brand, error) {
 	return s.repo.FindByID(id)
 }
 
-func (s *BrandService) GetAllBrands(page, pageSize int, search string) ([]model.Brand, int64, error) {
-	return s.repo.FindAll(page, pageSize, search)
+func (s *BrandService) GetAllBrands(page, pageSize int, search string, status bool) ([]model.Brand, int64, error) {
+	return s.repo.FindAll(page, pageSize, search, status)
 }
 
 func (s *BrandService) UpdateBrand(id uint, updatedBrand *model.Brand) error {
@@ -51,9 +51,10 @@ func (s *BrandService) UpdateBrand(id uint, updatedBrand *model.Brand) error {
 	if updatedBrand.Name != "" {
 		brand.Name = updatedBrand.Name
 	}
+
 	if updatedBrand.Slug != "" {
 		// Kiểm tra xem slug mới đã tồn tại chưa
-		existingBrand, _, err := s.repo.FindAll(1, 1, updatedBrand.Slug)
+		existingBrand, _, err := s.repo.FindAll(1, 1, updatedBrand.Slug, true)
 		if err != nil {
 			return fmt.Errorf("error checking existing category: %v", err)
 		}
@@ -62,12 +63,16 @@ func (s *BrandService) UpdateBrand(id uint, updatedBrand *model.Brand) error {
 		}
 		brand.Slug = updatedBrand.Slug
 	}
+
 	if updatedBrand.Description != "" {
 		brand.Description = updatedBrand.Description
 	}
+
 	if updatedBrand.LogoURL != "" {
 		brand.LogoURL = updatedBrand.LogoURL
 	}
+
+	brand.Status = updatedBrand.Status
 
 	return s.repo.Update(brand)
 }

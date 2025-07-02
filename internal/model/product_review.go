@@ -2,7 +2,6 @@ package model
 
 // import "gorm.io/gorm"
 
-// ProductReview represents a review of a product
 type ProductReview struct {
 	BaseModel
 	ProductID uint   `gorm:"column:product_id;index" json:"productId"` // Index cho truy vấn đánh giá theo sản phẩm

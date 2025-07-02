@@ -2,7 +2,6 @@ package model
 
 // import "gorm.io/gorm"
 
-// Category represents a product category
 type Category struct {
 	BaseModel
 	Name        string     `gorm:"column:name;index" json:"name"`

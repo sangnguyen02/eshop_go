@@ -18,7 +18,7 @@ func CreateBrandDoc() {}
 // @Accept json
 // @Produce json
 // @Param id path int true "Brand ID"
-// @Success 200 {object} model.Brand
+// @Success 200 {object} model.SuccessResponse
 // @Failure 400 {object} model.ErrorResponse
 // @Failure 404 {object} model.ErrorResponse
 // @Security BearerAuth

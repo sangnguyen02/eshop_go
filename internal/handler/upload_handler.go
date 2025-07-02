@@ -15,11 +15,13 @@ func NewUploadHandler() *UploadHandler {
 }
 
 func (h *UploadHandler) UploadFileSingle(c *gin.Context) {
+	fmt.Println("File received start:")
+
 	file, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": true,
-			"msg":   "Lỗi",
+			"msg":   err.Error(),
 		})
 		return
 	}
@@ -27,7 +29,7 @@ func (h *UploadHandler) UploadFileSingle(c *gin.Context) {
 	if file == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": true,
-			"msg":   "INVALID_PARAMS",
+			"msg":   "No file uploaded",
 		})
 		return
 	}
@@ -36,6 +38,9 @@ func (h *UploadHandler) UploadFileSingle(c *gin.Context) {
 	fullPath := utils.GetImageFullPath()
 	savePath := utils.GetImagePath()
 	src := fullPath + fileName
+
+	fmt.Println("File received:", file.Filename)
+	fmt.Println("Full path:", fullPath)
 
 	// Check image validity
 	if err := utils.CheckImage(fullPath); err != nil {

@@ -14,6 +14,7 @@ func RegisterRoutes(r *gin.Engine) {
 	productHandler := handler.NewProductHandler()
 	categoryHandler := handler.NewCategoryHandler()
 	brandHandler := handler.NewBrandHandler()
+	bannerHandler := handler.NewBannerHandler()
 	// seedHandler := handler.NewSeedHandler() // sample data
 
 	// #region API V1
@@ -25,7 +26,7 @@ func RegisterRoutes(r *gin.Engine) {
 	// #region upload route
 	upload := apiV1.Group("/upload")
 	{
-		upload.POST("/", uploadHandler.UploadFileSingle)
+		upload.POST("", uploadHandler.UploadFileSingle)
 		upload.POST("/multiple", uploadHandler.UploadFileMultiple)
 	}
 
@@ -78,38 +79,16 @@ func RegisterRoutes(r *gin.Engine) {
 			brands.DELETE("/:id", brandHandler.DeleteBrand)
 		}
 
+		banners := protected.Group("/banners")
+		{
+			banners.GET("/", bannerHandler.GetAllBanners)
+			banners.GET("/:id", bannerHandler.GetBannerByID)
+			banners.POST("/", bannerHandler.CreateBanner)
+			banners.PUT("/:id", bannerHandler.UpdateBanner)
+			banners.DELETE("/:id", bannerHandler.DeleteBanner)
+		}
+
 	}
-	// User
-	// users := apiV1.Group("/users")
-	// users.GET("/search", userHandler.SearchUsers)
-	// users.GET("/:id", userHandler.GetUserByID)
-	// users.PUT("/:id", userHandler.UpdateUser)
-	// users.PUT("/pass/:id", userHandler.UpdatePassword)
-	// users.DELETE("/:id", userHandler.DeleteUser)
-
-	// Product
-	// products := apiV1.Group("/products")
-	// products.GET("/search", productHandler.SearchProducts)
-	// products.GET("/:id", productHandler.GetProductByID)
-	// products.POST("", productHandler.CreateProduct)
-	// products.PUT("/:id", productHandler.UpdateProduct)
-	// products.DELETE("/:id", productHandler.DeleteProduct)
-
-	// Category
-	// categories := apiV1.Group("/categories")
-	// categories.GET("/", categoryHandler.GetAllCategories)
-	// categories.GET("/:id", categoryHandler.GetCategoryByID)
-	// categories.POST("", categoryHandler.CreateCategory)
-	// categories.PUT("/:id", categoryHandler.UpdateCategory)
-	// categories.DELETE("/:id", categoryHandler.DeleteCategory)
-
-	// Brand
-	// brands := apiV1.Group("/brands")
-	// brands.GET("/", brandHandler.GetAllBrands)
-	// brands.GET("/:id", brandHandler.GetBrandByID)
-	// brands.POST("", brandHandler.CreateBrand)
-	// brands.PUT("/:id", brandHandler.UpdateBrand)
-	// brands.DELETE("/:id", brandHandler.DeleteBrand)
 
 	// Seed
 	// apiV1.POST("/seed", seedHandler.SeedData)

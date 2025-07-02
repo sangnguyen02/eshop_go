@@ -2,7 +2,6 @@ package model
 
 // import "gorm.io/gorm"
 
-// ProductImage represents an image of a product
 type ProductImage struct {
 	BaseModel
 	ProductID uint   `gorm:"column:product_id;index:idx_product_image,priority:1" json:"productId"` // Composite index với IsPrimary

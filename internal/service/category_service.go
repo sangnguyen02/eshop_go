@@ -51,6 +51,7 @@ func (s *CategoryService) UpdateCategory(id uint, updatedCategory *model.Categor
 	if updatedCategory.Name != "" {
 		category.Name = updatedCategory.Name
 	}
+
 	if updatedCategory.Slug != "" {
 		// Kiểm tra xem slug mới đã tồn tại chưa
 		existingCategories, _, err := s.repo.FindAll(1, 1, updatedCategory.Slug, true)
@@ -62,12 +63,16 @@ func (s *CategoryService) UpdateCategory(id uint, updatedCategory *model.Categor
 		}
 		category.Slug = updatedCategory.Slug
 	}
+
 	if updatedCategory.Description != "" {
 		category.Description = updatedCategory.Description
 	}
+
 	if updatedCategory.ParentID != nil {
 		category.ParentID = updatedCategory.ParentID
 	}
+
+	category.Status = updatedCategory.Status
 
 	return s.repo.Update(category)
 }

@@ -68,6 +68,7 @@ func InitDB() *gorm.DB {
 		&model.ProductImage{},
 		&model.ProductVariant{},
 		&model.ProductReview{},
+		&model.Banner{},
 	)
 	if err != nil {
 		panic("Failed to migrate database (db): " + err.Error())

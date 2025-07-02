@@ -79,12 +79,18 @@ definitions:
         type: string
       slug:
         type: string
+      status:
+        type: boolean
       updated_at:
         example: "2025-06-24T15:04:05Z"
         type: string
     type: object
   model.Category:
     properties:
+      children:
+        items:
+          $ref: '#/definitions/model.Category'
+        type: array
       created_at:
         example: "2025-06-24T15:04:05Z"
         type: string
@@ -399,7 +405,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Brand'
+            $ref: '#/definitions/model.SuccessResponse'
         "400":
           description: Bad Request
           schema:
