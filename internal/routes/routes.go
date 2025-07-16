@@ -57,6 +57,9 @@ func RegisterRoutes(r *gin.Engine) {
 			products.POST("/", productHandler.CreateProduct)
 			products.PUT("/:id", productHandler.UpdateProduct)
 			products.DELETE("/:id", productHandler.DeleteProduct)
+
+			// customization
+			products.GET("/card", productHandler.SearchForCard)
 		}
 
 		// #region category route

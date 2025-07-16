@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"go_ecommerce/internal/dto"
 	"go_ecommerce/internal/model"
 	"go_ecommerce/internal/service"
+	"go_ecommerce/internal/utils/formatter"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type ProductHandler struct {
@@ -19,16 +22,18 @@ func NewProductHandler() *ProductHandler {
 
 // SearchProducts searches products by name with pagination
 func (h *ProductHandler) SearchProducts(c *gin.Context) {
-	name := c.Query("name")
-	// if name == "" {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "name query parameter is required"})
-	// 	return
-	// }
+	var req dto.SearchRequestParams
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters: " + err.Error()})
+		return
+	}
 
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
-
-	products, total, err := h.service.SearchProducts(name, page, pageSize)
+	validate := validator.New()
+	if err := validate.Struct(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"errors": formatter.FormatValidationErrors(err)})
+		return
+	}
+	products, total, err := h.service.SearchProducts(req.Name, req.Page, req.PageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -37,21 +42,26 @@ func (h *ProductHandler) SearchProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"data":     products,
 		"total":    total,
-		"page":     page,
-		"pageSize": pageSize,
+		"page":     req.Page,
+		"pageSize": req.PageSize,
 	})
 }
 
 // GetProductByID gets a product by ID
 func (h *ProductHandler) GetProductByID(c *gin.Context) {
-	idStr := c.Param("id")
-	id, err := strconv.ParseUint(idStr, 10, 32)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid product ID"})
+	var req dto.IDRequestParams
+	if err := c.ShouldBindUri(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID: " + err.Error()})
 		return
 	}
 
-	product, err := h.service.GetProductByID(uint(id))
+	validate := validator.New()
+	if err := validate.Struct(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"errors": formatter.FormatValidationErrors(err)})
+		return
+	}
+
+	product, err := h.service.GetProductByID(req.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -62,7 +72,7 @@ func (h *ProductHandler) GetProductByID(c *gin.Context) {
 
 // CreateProduct creates a new product
 func (h *ProductHandler) CreateProduct(c *gin.Context) {
-	var product model.Product // Sửa từ service.Product thành models.Product
+	var product model.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -115,4 +125,44 @@ func (h *ProductHandler) DeleteProduct(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "product deleted"})
+}
+
+// #region customiztion
+
+func (h *ProductHandler) SearchForCard(c *gin.Context) {
+	var req dto.SearchRequestParams
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query parameters: " + err.Error()})
+		return
+	}
+
+	validate := validator.New()
+	if err := validate.Struct(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"errors": formatter.FormatValidationErrors(err)})
+		return
+	}
+
+	products, total, err := h.service.SearchForCard(req.Name, req.Page, req.PageSize)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch products: " + err.Error()})
+		return
+	}
+
+	if len(products) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"data":     []dto.ProductCardResponse{},
+			"total":    total,
+			"page":     req.Page,
+			"pageSize": req.PageSize,
+			"message":  "No products found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":     products,
+		"total":    total,
+		"page":     req.Page,
+		"pageSize": req.PageSize,
+	})
 }

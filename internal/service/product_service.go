@@ -1,6 +1,7 @@
 package service
 
 import (
+	"go_ecommerce/internal/dto"
 	"go_ecommerce/internal/model"
 	"go_ecommerce/internal/repository"
 )
@@ -31,4 +32,20 @@ func (s *ProductService) UpdateProduct(product *model.Product) error {
 
 func (s *ProductService) DeleteProduct(id uint) error {
 	return s.repo.Delete(id)
+}
+
+// #region customization
+func (s *ProductService) SearchForCard(name string, page, pageSize int) ([]dto.ProductCardResponse, int64, error) {
+	products, total, err := s.repo.FindForCard(name, page, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+	// filter out-of-stock products
+	filtered := make([]dto.ProductCardResponse, 0)
+	for _, p := range products {
+		if p.Status == model.ProductStatusActive {
+			filtered = append(filtered, p)
+		}
+	}
+	return filtered, total, nil
 }
